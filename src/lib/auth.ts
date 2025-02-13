@@ -17,3 +17,20 @@ export const getAuthSession = async (
   const session = await getServerSession(...parameters, authOptions);
   return session;
 };
+
+export const getRequiredAuthSession = async (
+  ...parameters: ParametersGetServerSession
+) => {
+  const session = await getServerSession(...parameters, authOptions);
+
+  if (!session?.user.id) throw new Error("Error Session");
+
+  return session as {
+    user: {
+      id: string;
+      email?: string;
+      image?: string;
+      name?: string;
+    };
+  };
+};
