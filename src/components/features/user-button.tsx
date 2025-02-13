@@ -1,5 +1,5 @@
 import { getAuthSession } from "@/lib/auth";
-import { UserLogged, UserLogin } from "../userStatusButton";
+import { UserLogged, UserLogin } from "./userStatusButton";
 
 export const UserButton = async () => {
   const session = await getAuthSession();

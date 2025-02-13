@@ -1,17 +1,18 @@
 "use client";
 
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { signIn, signOut } from "next-auth/react";
 import { LogOut, User } from "lucide-react";
 import type { Session } from "next-auth";
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage } from "../ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -20,7 +21,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "./ui/alert-dialog";
+} from "../ui/alert-dialog";
+
+import Link from "next/link";
 
 export const UserLogin = () => {
   return (
@@ -56,6 +59,13 @@ export const UserLogged = ({ user }: UserLogged) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <Link href="/account">
+              <User size={12} />
+              My Account
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <AlertDialogTrigger asChild>
             <DropdownMenuItem>
               <LogOut size={12} />
@@ -80,5 +90,18 @@ export const UserLogged = ({ user }: UserLogged) => {
         </AlertDialogContent>
       </AlertDialog>
     </DropdownMenu>
+  );
+};
+
+export const UserLogout = () => {
+  return (
+    <Button
+      variant="destructive"
+      onClick={async () => signOut()}
+      className="ml-auto"
+    >
+      <LogOut size={12} />
+      Logout
+    </Button>
   );
 };
