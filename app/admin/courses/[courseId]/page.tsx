@@ -20,8 +20,8 @@ import { getRequiredAuthSession } from "@/lib/auth";
 import Link from "next/link";
 import {
   PreviewButton,
-  Nextbutton,
-} from "@/components/features/pagination/paginationButton";
+  NextButton,
+} from "@/components/features/pagination/PaginationButton";
 import { getCourse } from "./course.query";
 
 export default async function CoursePage({
@@ -102,7 +102,7 @@ export default async function CoursePage({
                 />
               )}
               {totalpage > page && totalpage != 0 ? (
-                <Nextbutton
+                <NextButton
                   baseUrl={`/admin/courses/${course.id}`}
                   page={page}
                 />

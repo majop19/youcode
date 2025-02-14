@@ -28,7 +28,7 @@ export const PreviewButton = (props: CoursePaginationButtonProps) => {
   );
 };
 
-export const Nextbutton = (props: CoursePaginationButtonProps) => {
+export const NextButton = (props: CoursePaginationButtonProps) => {
   const router = useRouter();
 
   return (
@@ -42,7 +42,6 @@ export const Nextbutton = (props: CoursePaginationButtonProps) => {
         const url = `${props.baseUrl}?${searchParams.toString()}`;
         router.push(url);
       }}
-      disabled
     >
       Next
     </Button>
