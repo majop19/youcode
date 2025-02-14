@@ -10,7 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import Link from "next/link";
-import { UserLogout } from "@/components/features/userStatusButton";
+import { UserLogout } from "@/components/features/auth/userStatusButton";
 import { buttonVariants } from "@/components/ui/button";
 
 export default async function AccountPage() {

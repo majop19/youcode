@@ -1,7 +1,7 @@
 "use client"; // Error components must be Client Components
 
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserLogin } from "@/components/features/userStatusButton";
+import { UserLogin } from "@/components/features/auth/userStatusButton";
 
 import { useEffect } from "react";
 

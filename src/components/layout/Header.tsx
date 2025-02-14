@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ThemeToggle } from "../theme/ThemeToggle";
 import { Typography } from "../ui/typography";
 import Image from "next/image";
-import { UserButton } from "../features/user-button";
+import { UserButton } from "../features/auth/user-button";
 
 export function Header() {
   return (
