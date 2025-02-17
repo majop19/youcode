@@ -4,12 +4,12 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from "@/components/layout/layout";
-import { CourseCard } from "../courses/CourseCard";
 import { getCourses } from "../courses/course.query";
 import { getAuthSession } from "@/lib/auth";
 import NotAuthentificatedCard from "./NotAuthenticatedCard";
+import { CourseCard } from "./courseCard";
 
-export default async function ExplorerPage() {
+export default async function CoursesPage() {
   const session = await getAuthSession();
 
   if (!session) return <NotAuthentificatedCard />;
