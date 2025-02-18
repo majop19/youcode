@@ -13,12 +13,25 @@ const CourseActionEditProps = z.object({
 export const courseActionEdit = authenticatedAction
   .schema(CourseActionEditProps)
   .action(async ({ parsedInput, ctx }) => {
-    await prisma.course.update({
+    const course = await prisma.course.update({
       where: {
         id: parsedInput.courseId,
         creatorId: ctx.userId,
       },
       data: parsedInput.data,
     });
-    return "Course updated successfully";
+    return { id: course.id, message: "Course updated successfully" };
+  });
+
+export const courseActionCreate = authenticatedAction
+  .schema(CourseFormSchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const course = await prisma.course.create({
+      data: {
+        creatorId: ctx.userId,
+        ...parsedInput,
+      },
+    });
+
+    return { id: course.id, message: "Course created successfully" };
   });

@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { CourseFormSchema } from "./course.schema";
-import { courseActionEdit } from "./course.action";
+import { courseActionCreate, courseActionEdit } from "./course.action";
 
 export type CourseFormProps = {
   defaultValue?: CourseFormSchema & {
@@ -29,35 +29,40 @@ export type CourseFormProps = {
 export const CourseForm = ({ defaultValue }: CourseFormProps) => {
   const form = useZodForm({
     schema: CourseFormSchema,
-    defaultValues: defaultValue,
+    defaultValues: defaultValue ?? {
+      image: "",
+      name: "",
+      presentation: "",
+    },
   });
   const router = useRouter();
 
   return (
     <Form
+      className="flex flex-col gap-4"
       form={form}
       onSubmit={async (values) => {
-        if (defaultValue?.id) {
-          const res = await courseActionEdit({
-            courseId: defaultValue.id,
-            data: values,
-          });
+        const res = defaultValue?.id
+          ? await courseActionEdit({
+              courseId: defaultValue.id,
+              data: values,
+            })
+          : await courseActionCreate(values);
 
-          if (res?.data) {
-            toast.success(res?.data);
-            router.push(`/admin/courses/${defaultValue.id}`);
-            router.refresh();
-            return;
-          }
+        if (res?.data) {
+          toast.success(res.data.message);
 
-          toast.error("Some error occurred", {
-            description: res?.serverError?.serverError ?? "unknown Error",
-          });
+          router.push(`/admin/courses/${res.data.id}`);
 
+          router.refresh();
           return;
-        } else {
-          // create course
         }
+
+        toast.error("Some error occurred", {
+          description: res?.serverError?.serverError ?? "unknown Error",
+        });
+
+        return;
       }}
     >
       <FormField

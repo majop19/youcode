@@ -1,10 +1,12 @@
 import {
   Layout,
+  LayoutActions,
   LayoutContent,
   LayoutHeader,
   LayoutTitle,
 } from "@/components/layout/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -17,6 +19,7 @@ import {
 import { Typography } from "@/components/ui/typography";
 import { getRequiredAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 export default async function CoursesPage() {
@@ -30,9 +33,17 @@ export default async function CoursesPage() {
 
   return (
     <Layout>
-      <LayoutHeader>
+      <LayoutHeader className="flex">
         <LayoutTitle>Courses</LayoutTitle>
       </LayoutHeader>
+      <LayoutActions>
+        <Link
+          className={cn(buttonVariants({ variant: "outline" }))}
+          href="/admin/courses/new"
+        >
+          New Course
+        </Link>
+      </LayoutActions>
       <LayoutContent>
         <Card>
           <CardContent className="mt-4">
