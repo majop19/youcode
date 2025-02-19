@@ -109,7 +109,6 @@ export const CourseForm = ({ defaultValue }: CourseFormProps) => {
           </FormItem>
         )}
       />
-
       <Button type="submit">Submit</Button>
     </Form>
   );

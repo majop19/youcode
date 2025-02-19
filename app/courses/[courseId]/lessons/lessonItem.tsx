@@ -1,7 +1,7 @@
 import { Typography } from "@/components/ui/typography";
 import { CheckCircle, Circle, CircleDashed } from "lucide-react";
 import Link from "next/link";
-import type { CourseLessonItem } from "../../course.query";
+import type { CourseLessonItem } from "../course.query";
 
 export type LessonItemProps = {
   lesson: CourseLessonItem;

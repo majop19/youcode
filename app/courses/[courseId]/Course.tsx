@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import type { CourseType } from "./course.query";
-import { LessonItem } from "./lessons/[lessonId]/lessonItem";
+import { LessonItem } from "./lessons/lessonItem";
 import { MarkdownProse } from "@/components/features/mdx/MarkdownProse";
 
 export type CourseProps = {
