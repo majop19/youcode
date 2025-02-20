@@ -26,6 +26,7 @@ export const getCourseLessons = async ({
           name: true,
           state: true,
           courseId: true,
+          rank: true,
         },
       },
     },
@@ -35,3 +36,7 @@ export const getCourseLessons = async ({
 export type AdminLessonItemType = NonNullable<
   Prisma.PromiseReturnType<typeof getCourseLessons>
 >["lessons"][number];
+
+export type AdminCourseType = NonNullable<
+  Prisma.PromiseReturnType<typeof getCourseLessons>
+>;

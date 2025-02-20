@@ -7,10 +7,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRequiredAuthSession } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
-import { AdminLessonItem } from "./AdminLessonItem";
-import { getCourseLessons } from "./lessons.query";
+import { getCourseLessons } from "./CourseLessons.query";
 import { prisma } from "@/lib/prisma";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { AdminLessonSortable } from "./AdminLessonSortable";
 
 export default async function CourseLessonsPage({
   params,
@@ -41,9 +41,7 @@ export default async function CourseLessonsPage({
             <CardTitle>Lessons</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            {course.lessons.map((lesson) => (
-              <AdminLessonItem key={lesson.id} lesson={lesson} />
-            ))}
+            <AdminLessonSortable items={course.lessons} />
             <form>
               <SubmitButton
                 size="sm"
@@ -63,7 +61,7 @@ export default async function CourseLessonsPage({
                   const lesson = await prisma.lesson.create({
                     data: {
                       name: "Draft Lesson",
-                      rank: "aaaaa",
+                      rank: "aaazaaa",
                       state: "HIDDEN",
                       courseId: courseId,
                       content: "## Default content",
