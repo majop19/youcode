@@ -1,15 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import type { CourseType } from "./course.query";
+import { UserHasCourse, type CourseType } from "./course.query";
 import { LessonItem } from "./lessons/lessonItem";
 import { MarkdownProse } from "@/components/features/mdx/MarkdownProse";
+import { getRequiredAuthSession } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export type CourseProps = {
   course: CourseType;
 };
 
-export const Course = ({ course }: CourseProps) => {
+export const Course = async ({ course }: CourseProps) => {
+  const session = await getRequiredAuthSession();
+
+  const courseOnUser = await UserHasCourse(course.id, session.user.id);
+
   return (
     <div className="flex flex-col items-start gap-4 lg:flex-row">
       <Card className="flex-[2] hover:bg-accent">
@@ -36,6 +52,49 @@ export const Course = ({ course }: CourseProps) => {
         <CardContent>
           <MarkdownProse markdown={course.presentation} />
         </CardContent>
+        {!courseOnUser ? (
+          <CardFooter>
+            <form>
+              <Button
+                formAction={async () => {
+                  "use server";
+                  const session = await getRequiredAuthSession();
+
+                  const courseOnUser = await prisma.courseOnUser.create({
+                    data: {
+                      userId: session.user.id,
+                      courseId: course.id,
+                    },
+                    select: {
+                      course: {
+                        select: {
+                          lessons: {
+                            orderBy: {
+                              rank: "asc",
+                            },
+                            take: 1,
+                            select: {
+                              id: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  });
+                  const lesson = courseOnUser.course.lessons[0];
+
+                  revalidatePath(`/courses/${course.id}`);
+
+                  if (!lesson) return;
+
+                  redirect(`/courses/${course.id}/lessons/${lesson.id}`);
+                }}
+              >
+                Join
+              </Button>
+            </form>
+          </CardFooter>
+        ) : null}
       </Card>
       <Card className="flex-1">
         <CardHeader>

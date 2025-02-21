@@ -80,3 +80,14 @@ export type CourseType = NonNullable<
 >;
 
 export type CourseLessonItem = CourseType["lessons"][0];
+
+export const UserHasCourse = async (courseId: string, userId: string) =>
+  prisma.courseOnUser.findFirst({
+    where: {
+      courseId: courseId,
+      userId: userId,
+    },
+    select: {
+      id: true,
+    },
+  });

@@ -5,7 +5,7 @@ import {
   LayoutTitle,
 } from "@/components/layout/layout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -23,7 +23,16 @@ import {
   NextButton,
 } from "@/components/features/pagination/PaginationButton";
 import { getAdminCourse } from "./adminCourse.query";
-
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 export default async function CoursePage({
   params,
   searchParams,
@@ -65,6 +74,8 @@ export default async function CoursePage({
                 <TableRow>
                   <TableHead>Image</TableHead>
                   <TableHead>Name</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-end">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -89,6 +100,65 @@ export default async function CoursePage({
                       >
                         {user.email}
                       </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">
+                        {user.canceled ? "Canceled" : "Active"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="flex flex-row-reverse">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button size="sm" variant="secondary">
+                            <Menu size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem asChild>
+                            <form>
+                              <button
+                                formAction={async () => {
+                                  "use server";
+
+                                  const session =
+                                    await getRequiredAuthSession();
+
+                                  const courseId = params.courseId;
+                                  const userId = user.id;
+
+                                  const courseOnUser =
+                                    await prisma.courseOnUser.findFirst({
+                                      where: {
+                                        userId,
+                                        course: {
+                                          id: courseId,
+                                          creatorId: session.user.id,
+                                        },
+                                      },
+                                    });
+
+                                  if (!courseOnUser) return;
+
+                                  await prisma.courseOnUser.update({
+                                    where: {
+                                      id: courseOnUser.id,
+                                    },
+                                    data: {
+                                      canceledAt: courseOnUser.canceledAt
+                                        ? null
+                                        : new Date(),
+                                    },
+                                  });
+
+                                  revalidatePath(`/admin/courses/${courseId}`);
+                                }}
+                              >
+                                {user.canceled ? "Activate" : "Cancel"}
+                              </button>
+                            </form>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
