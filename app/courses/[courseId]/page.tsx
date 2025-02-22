@@ -6,19 +6,22 @@ import {
 } from "@/components/layout/layout";
 import { getAuthSession } from "@/lib/auth";
 import { notFound } from "next/navigation";
-import { Course } from "./Course";
-import { getCourse } from "./course.query";
 
-export default async function CoursePage({
+import React from "react";
+import { getCourse } from "./course.query";
+import { Course } from "./Course";
+
+export default async function ModalPage({
   params,
 }: {
   params: {
     courseId: string;
   };
 }) {
+  const { courseId } = await params;
   const session = await getAuthSession();
   const course = await getCourse({
-    courseId: params.courseId,
+    courseId: courseId,
     userId: session?.user.id,
   });
 
@@ -29,7 +32,7 @@ export default async function CoursePage({
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Your courses</LayoutTitle>
+        <LayoutTitle>Course</LayoutTitle>
       </LayoutHeader>
       <LayoutContent>
         <Course course={course} />

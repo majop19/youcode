@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import { UserHasCourse, type CourseType } from "./course.query";
 import { LessonItem } from "./lessons/lessonItem";
@@ -27,85 +21,87 @@ export const Course = async ({ course }: CourseProps) => {
   const courseOnUser = await UserHasCourse(course.id, session.user.id);
 
   return (
-    <div className="flex flex-col items-start gap-4 lg:flex-row">
-      <Card className="flex-[2] hover:bg-accent">
-        <CardHeader className="flex flex-row gap-3 space-y-0">
-          <Avatar className="size-14 rounded">
-            <AvatarFallback>{course.name[0]}</AvatarFallback>
-            {course.image ? <AvatarImage src={course.image} /> : null}
-          </Avatar>
-          <div className="flex flex-col gap-3">
-            <CardTitle>{course.name}</CardTitle>
-            <div className="flex flex-row gap-2">
-              <Avatar className="size-8">
-                <AvatarFallback>{course.name[0]}</AvatarFallback>
-                {course.creator.image ? (
-                  <AvatarImage src={course.creator.image} />
-                ) : null}
-              </Avatar>
-              <Typography variant="large" className=" text-muted-foreground">
-                {course.creator.name}
-              </Typography>
+    <div className="flex flex-col items-start gap-4">
+      <div className="flex w-full flex-col items-start gap-4 lg:flex-row">
+        <Card className="flex-[2] hover:bg-accent">
+          <CardHeader className="flex flex-row gap-3 space-y-0">
+            <Avatar className="size-14 rounded">
+              <AvatarFallback>{course.name[0]}</AvatarFallback>
+              {course.image ? <AvatarImage src={course.image} /> : null}
+            </Avatar>
+            <div className="flex flex-col gap-3">
+              <CardTitle>{course.name}</CardTitle>
+              <div className="flex flex-row gap-2">
+                <Avatar className="size-8">
+                  <AvatarFallback>{course.name[0]}</AvatarFallback>
+                  {course.creator.image ? (
+                    <AvatarImage src={course.creator.image} />
+                  ) : null}
+                </Avatar>
+                <Typography variant="large" className=" text-muted-foreground">
+                  {course.creator.name}
+                </Typography>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <MarkdownProse markdown={course.presentation} />
-        </CardContent>
-        {!courseOnUser ? (
-          <CardFooter>
-            <form>
-              <Button
-                formAction={async () => {
-                  "use server";
-                  const session = await getRequiredAuthSession();
+          </CardHeader>
+          <CardContent>
+            <MarkdownProse markdown={course.presentation} />
+          </CardContent>
+        </Card>
+        <Card className="flex-1">
+          <CardHeader>
+            <CardTitle>Lessons</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2">
+            {course.lessons.map((lesson) => (
+              <LessonItem lesson={lesson} key={lesson.id} />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+      {!courseOnUser ? (
+        <div>
+          <form>
+            <Button
+              formAction={async () => {
+                "use server";
+                const session = await getRequiredAuthSession();
 
-                  const courseOnUser = await prisma.courseOnUser.create({
-                    data: {
-                      userId: session.user.id,
-                      courseId: course.id,
-                    },
-                    select: {
-                      course: {
-                        select: {
-                          lessons: {
-                            orderBy: {
-                              rank: "asc",
-                            },
-                            take: 1,
-                            select: {
-                              id: true,
-                            },
+                const courseOnUser = await prisma.courseOnUser.create({
+                  data: {
+                    userId: session.user.id,
+                    courseId: course.id,
+                  },
+                  select: {
+                    course: {
+                      select: {
+                        lessons: {
+                          orderBy: {
+                            rank: "asc",
+                          },
+                          take: 1,
+                          select: {
+                            id: true,
                           },
                         },
                       },
                     },
-                  });
-                  const lesson = courseOnUser.course.lessons[0];
+                  },
+                });
+                const lesson = courseOnUser.course.lessons[0];
 
-                  revalidatePath(`/courses/${course.id}`);
+                revalidatePath(`/courses/${course.id}`);
 
-                  if (!lesson) return;
+                if (!lesson) return;
 
-                  redirect(`/courses/${course.id}/lessons/${lesson.id}`);
-                }}
-              >
-                Join
-              </Button>
-            </form>
-          </CardFooter>
-        ) : null}
-      </Card>
-      <Card className="flex-1">
-        <CardHeader>
-          <CardTitle>Lessons</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          {course.lessons.map((lesson) => (
-            <LessonItem lesson={lesson} key={lesson.id} />
-          ))}
-        </CardContent>
-      </Card>
+                redirect(`/courses/${course.id}/lessons/${lesson.id}`);
+              }}
+            >
+              Join
+            </Button>
+          </form>
+        </div>
+      ) : null}
     </div>
   );
 };

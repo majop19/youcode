@@ -6,7 +6,7 @@ import {
 } from "@/components/layout/layout";
 
 import { getCourses } from "../courses/course.query";
-import { CourseCard } from "../courses/courseCard";
+import { CourseCard } from "../courses/CourseCard";
 
 export default async function ExplorerPage() {
   const courses = await getCourses();
