@@ -17,6 +17,15 @@ export const getCourse = async ({
       image: true,
       name: true,
       presentation: true,
+      users: {
+        where: {
+          userId,
+        },
+        select: {
+          canceledAt: true,
+          id: true,
+        },
+      },
       lessons: {
         where: {
           state: {
@@ -71,6 +80,8 @@ export const getCourse = async ({
 
   return {
     ...course,
+    isEnrolled: course.users.length > 0 && !course.users[0].canceledAt,
+    isCanceled: course.users.length > 0 && !!course.users[0].canceledAt,
     lessons,
   };
 };
@@ -80,14 +91,3 @@ export type CourseType = NonNullable<
 >;
 
 export type CourseLessonItem = CourseType["lessons"][0];
-
-export const UserHasCourse = async (courseId: string, userId: string) =>
-  prisma.courseOnUser.findFirst({
-    where: {
-      courseId: courseId,
-      userId: userId,
-    },
-    select: {
-      id: true,
-    },
-  });

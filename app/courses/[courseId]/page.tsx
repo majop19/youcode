@@ -11,14 +11,10 @@ import React from "react";
 import { getCourse } from "./course.query";
 import { Course } from "./Course";
 
-export default async function ModalPage({
-  params,
-}: {
-  params: {
-    courseId: string;
-  };
+export default async function CoursePage(props: {
+  params: Promise<{ courseId: string }>;
 }) {
-  const { courseId } = await params;
+  const { courseId } = await props.params;
   const session = await getAuthSession();
   const course = await getCourse({
     courseId: courseId,

@@ -7,13 +7,14 @@ import { CourseDialog } from "./CourseDialog";
 export default async function CoursePage({
   params,
 }: {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 }) {
+  const { courseId } = await params;
   const session = await getAuthSession();
   const course = await getCourse({
-    courseId: params.courseId,
+    courseId: courseId,
     userId: session?.user.id,
   });
 
@@ -23,7 +24,7 @@ export default async function CoursePage({
 
   return (
     <CourseDialog course={course}>
-      <Course course={course} />
+      <Course course={course} userId={session?.user.id} />
     </CourseDialog>
   );
 }

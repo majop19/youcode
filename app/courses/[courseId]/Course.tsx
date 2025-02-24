@@ -1,25 +1,24 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import { UserHasCourse, type CourseType } from "./course.query";
-import { LessonItem } from "./lessons/lessonItem";
-import { MarkdownProse } from "@/components/features/mdx/MarkdownProse";
+
 import { getRequiredAuthSession } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import type { CourseType } from "./course.query";
+import { MarkdownProse } from "@/components/features/mdx/MarkdownProse";
+import { LessonItem } from "./lessons/lessonItem";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export type CourseProps = {
   course: CourseType;
+  userId?: string;
 };
 
-export const Course = async ({ course }: CourseProps) => {
-  const session = await getRequiredAuthSession();
-
-  const courseOnUser = await UserHasCourse(course.id, session.user.id);
-
+export const Course = ({ course, userId }: CourseProps) => {
+  const isLogin = Boolean(userId);
+  console.log(!course.isCanceled, !course.isEnrolled);
   return (
     <div className="flex flex-col items-start gap-4">
       <div className="flex w-full flex-col items-start gap-4 lg:flex-row">
@@ -59,12 +58,13 @@ export const Course = async ({ course }: CourseProps) => {
           </CardContent>
         </Card>
       </div>
-      {!courseOnUser ? (
+      {!course.isCanceled && !course.isEnrolled && isLogin ? (
         <div>
           <form>
-            <Button
+            <SubmitButton
               formAction={async () => {
                 "use server";
+
                 const session = await getRequiredAuthSession();
 
                 const courseOnUser = await prisma.courseOnUser.create({
@@ -75,6 +75,7 @@ export const Course = async ({ course }: CourseProps) => {
                   select: {
                     course: {
                       select: {
+                        id: true,
                         lessons: {
                           orderBy: {
                             rank: "asc",
@@ -88,17 +89,16 @@ export const Course = async ({ course }: CourseProps) => {
                     },
                   },
                 });
+
                 const lesson = courseOnUser.course.lessons[0];
 
                 revalidatePath(`/courses/${course.id}`);
-
-                if (!lesson) return;
 
                 redirect(`/courses/${course.id}/lessons/${lesson.id}`);
               }}
             >
               Join
-            </Button>
+            </SubmitButton>
           </form>
         </div>
       ) : null}

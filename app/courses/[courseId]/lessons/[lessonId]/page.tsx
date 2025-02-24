@@ -1,52 +1,74 @@
-import { getRequiredAuthSession } from "@/lib/auth";
-import { getCourse } from "../../course.query";
-import { LessonItem } from "../lessonItem";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getLessonUser } from "./lessonsUser.query";
-import { MarkdownProse } from "@/components/features/mdx/MarkdownProse";
-export default async function CoursePage({
+import {
+  Layout,
+  LayoutContent,
+  LayoutHeader,
+  LayoutTitle,
+} from "@/components/layout/layout";
+import { buttonVariants } from "@/components/ui/button";
+import { getAuthSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { LessonsNavigation } from "./LessonsNavigation";
+import { getLesson } from "./lesson.query";
+import { Lesson } from "./lesson";
+
+export default async function LessonPage({
   params,
 }: {
   params: {
-    courseId: string;
     lessonId: string;
+    courseId: string;
   };
 }) {
-  const session = await getRequiredAuthSession();
+  const session = await getAuthSession();
+  const lesson = await getLesson(params.lessonId, session?.user.id);
 
-  const course = await getCourse({
-    courseId: params.courseId,
-    userId: session.user.id,
+  if (!lesson) {
+    notFound();
+  }
+
+  const isAuthorized = await prisma.course.findUnique({
+    where: {
+      id: params.courseId,
+    },
+    select: {
+      users: {
+        where: {
+          userId: session?.user.id ?? "-",
+          canceledAt: null,
+        },
+      },
+    },
   });
 
-  const lesson = await getLessonUser(
-    session.user.id,
-    params.courseId,
-    params.lessonId
-  );
-
-  if (!lesson) return;
+  if (lesson.state !== "PUBLIC" && !isAuthorized?.users.length) {
+    return (
+      <Layout>
+        <LayoutHeader>
+          <LayoutTitle>
+            You need to be enrolled in this course to view this lesson.
+          </LayoutTitle>
+        </LayoutHeader>
+        <LayoutContent>
+          <Link
+            href={`/courses/${params.courseId}`}
+            className={buttonVariants()}
+          >
+            Join now
+          </Link>
+        </LayoutContent>
+      </Layout>
+    );
+  }
 
   return (
-    <div className="m-10 flex flex-row gap-2">
-      <Card className="grid-col flex-2 grid items-center gap-2">
-        <CardHeader>
-          <CardTitle>{course?.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {course?.lessons.map((lesson) => (
-            <LessonItem key={lesson.id} lesson={lesson} />
-          ))}
-        </CardContent>
-      </Card>
-      <Card className="flex-[2]">
-        <CardHeader>
-          <CardTitle>{lesson.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <MarkdownProse markdown={lesson.content} />
-        </CardContent>
-      </Card>
+    <div className="flex items-start gap-4 p-4">
+      <LessonsNavigation
+        courseId={params.courseId}
+        currentLessonId={lesson.id}
+      />
+      <Lesson lesson={lesson} />
     </div>
   );
 }

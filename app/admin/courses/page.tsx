@@ -22,7 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export default async function CoursesPage() {
+export default async function AdminCoursesPage() {
   const session = await getRequiredAuthSession();
 
   const courses = await prisma.course.findMany({

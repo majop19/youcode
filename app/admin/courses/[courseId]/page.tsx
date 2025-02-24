@@ -33,7 +33,7 @@ import {
 import { Menu } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-export default async function CoursePage({
+export default async function AdminCoursePage({
   params,
   searchParams,
 }: {
