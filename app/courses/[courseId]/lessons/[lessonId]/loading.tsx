@@ -1,5 +1,5 @@
-import { LessonsNavigationSkeleton } from "./LessonNavigationSkeleton";
-import { LessonSkeleton } from "./LessonSkeleton";
+import { LessonsNavigationSkeleton } from "../LessonNavigationSkeleton";
+import { LessonSkeleton } from "../LessonSkeleton";
 
 export default function LessonLoading() {
   return (

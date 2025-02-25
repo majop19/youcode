@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LessonItemPlaceholder } from "../lessonItemPlaceholder";
+import { LessonItemPlaceholder } from "./lessonItemPlaceholder";
 
 export const LessonsNavigationSkeleton = () => {
   return (

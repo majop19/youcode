@@ -1,20 +1,11 @@
-import {
-  Layout,
-  LayoutContent,
-  LayoutHeader,
-  LayoutTitle,
-} from "@/components/layout/layout";
-import { Loader } from "lucide-react";
+import { LessonsNavigationSkeleton } from "./LessonNavigationSkeleton";
+import { LessonSkeleton } from "./LessonSkeleton";
 
-export default function loading() {
+export default function LessonLoading() {
   return (
-    <Layout>
-      <LayoutHeader>
-        <LayoutTitle>Loading...</LayoutTitle>
-      </LayoutHeader>
-      <LayoutContent>
-        <Loader size={32} className="animate-spin" />
-      </LayoutContent>
-    </Layout>
+    <div className="flex items-start gap-4 p-4">
+      <LessonsNavigationSkeleton />
+      <LessonSkeleton />
+    </div>
   );
 }
